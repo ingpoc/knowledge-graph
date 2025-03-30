@@ -1,0 +1,67 @@
+---
+description: 
+globs: **/api/mcp/**/*.ts, **/lib/mcp/**/*.ts, **/server/mcp/**/*.ts
+alwaysApply: false
+---
+You are implementing a Model Context Protocol (MCP) server for AI agent knowledge persistence.
+
+API Structure
+- Create RESTful endpoints following consistent URL patterns (/api/context, /api/entities, etc.)
+- Implement proper error handling with descriptive messages and appropriate status codes
+- Use TypeScript interfaces for all request/response models
+- Structure API responses with consistent formats {status, data, error}
+- Include pagination, sorting, and filtering for list endpoints
+- Add appropriate validation for all input parameters
+
+Knowledge Graph Operations
+- Use the DuckDB storage layer for all graph operations
+- Implement efficient querying for context retrieval with parametrized queries
+- Create indexes for performance-critical queries (entity lookup, text search)
+- Support batch operations for entity and relationship creation/updates
+- Implement proper transactions for multi-entity operations
+- Separate database models from API response models
+
+Context Retrieval Optimization
+- Implement relevance scoring for context query results
+- Support multiple query parameters (file path, component name, feature, keywords)
+- Allow filtering by project, entity type, and confidence score
+- Include relationship depth parameters for graph traversal
+- Support cross-project queries with appropriate boundaries
+- Optimize for low-latency responses (<100ms) for context queries
+
+Entity Models
+- Create consistent entity models with required fields: id, name, type, project
+- Support metadata fields for additional entity properties
+- Include timestamps for creation and last update
+- Track source information (conversation ID, timestamp)
+- Implement versioning for entity changes
+- Support confidence scoring for entities (0.0-1.0)
+
+Relationship Models
+- Define typed relationships with proper directionality (from, to, type)
+- Include strength indicators for relationships (0.0-1.0)
+- Support metadata for relationship context
+- Implement traversal optimization for frequently accessed paths
+- Allow cross-project relationships with appropriate constraints
+
+Observation Handling
+- Store observations as text with entity associations
+- Support versioning for observations
+- Include creation and update timestamps
+- Track observation sources
+- Implement confidence scoring
+- Support invalidation without deletion for historical tracking
+
+Project Separation
+- Ensure strict project boundaries in default queries
+- Implement project-based access controls
+- Support cross-project relationship visibility when requested
+- Maintain project metadata (name, description, creation date)
+- Track project-level statistics (entity counts, relationship density)
+
+Integration with AI Agents
+- Create optimized batch update endpoints for agent-discovered knowledge
+- Implement confidence adjustment mechanisms
+- Support knowledge invalidation workflows
+- Provide efficient context retrieval for time-sensitive agent operations
+- Enable schema introspection for agent understanding

@@ -1,0 +1,16 @@
+---
+description: 
+globs: **/db/**/*.ts, **/lib/db/**/*.ts
+alwaysApply: false
+---
+DuckDB and Data Handling
+- Create a database service layer under /lib/db.
+- Use parameterized queries to prevent injection.
+- Implement connection pooling for efficient database usage.
+- Create type-safe query builders for database operations.
+- Handle errors gracefully with appropriate logging.
+- Implement proper transactions for multi-record operations.
+- Use optimistic updates for improved UX.
+- Create clear separation between database and UI models.
+- Implement proper data validation before storage.
+- Cache frequent queries for better performance.

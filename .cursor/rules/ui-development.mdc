@@ -1,0 +1,15 @@
+---
+description: 
+globs: **/*.tsx, **/components/**/*.ts
+alwaysApply: false
+---
+UI and Styling
+- Use Shadcn UI, Radix, and Tailwind for components and styling.
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+- Follow modern UI design principles with clean, accessible interfaces.
+- Use Shadcn UI components for forms, dialogs, tables, and navigation.
+- Implement dark mode support using Tailwind's dark mode utilities.
+- Use Radix Primitives for complex interactive components.
+- Ensure all UI components are accessible (ARIA attributes, keyboard navigation).
+- Create consistent UI patterns across the application.
+- Use CSS variables for theming when appropriate.

@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Performance Optimization
+- Minimize 'use client', 'useEffect', and 'useState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+- Use React.memo for expensive render components.
+- Implement virtualization for large lists and tables.
+- Cache expensive calculations with useMemo.
+- Use incremental static regeneration for semi-static pages.
+- Optimize bundle size with proper code splitting.
+- Minimize client-side JavaScript when possible.

@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/app/**/*.tsx, **/pages/**/*.tsx
+alwaysApply: false
+---
+Page Structure
+- Use layout components for shared UI elements.
+- Implement proper loading states and error boundaries.
+- Create responsive layouts for all screen sizes.
+- Use Server Components where possible for improved performance.
+- Handle metadata and SEO considerations for each page.
+- Implement proper navigation with Next.js Link component.
+- Use appropriate page segments for dynamic routing.
+- Consider accessibility in page structure and navigation.

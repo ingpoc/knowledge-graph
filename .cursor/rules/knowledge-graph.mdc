@@ -1,0 +1,16 @@
+---
+description: Knowledge Graph Rules
+globs: 
+alwaysApply: false
+---
+Knowledge Graph Implementation
+- Use D3.js for relationship visualization, wrapped in React components.
+- Implement proper graph navigation tools (zoom, pan, filter).
+- Show relationship strength with line thickness proportional to strength.
+- Use dashed green lines for distinct relationships.
+- Implement parent-child relationship detection based on naming conventions.
+- Add directional arrows to show relationship direction.
+- Create explicit visual representation with special hierarchy links.
+- Provide visual context for relationships with tooltips and highlights.
+- Ensure relationship visualization is interactive and informative.
+- Implement proper performance optimizations for large graphs.

@@ -1,0 +1,14 @@
+---
+description: 
+globs: **/api/**/*.ts, **/app/api/**/*.ts
+alwaysApply: false
+---
+API Development
+- Create RESTful API endpoints following HTTP standards.
+- Implement proper error handling and status codes.
+- Validate input data with strong typing.
+- Create middleware for common operations like authentication.
+- Document API endpoints with clear JSDoc comments.
+- Implement rate limiting and security best practices.
+- Use consistent response format across all endpoints.
+- Handle pagination for list endpoints.
