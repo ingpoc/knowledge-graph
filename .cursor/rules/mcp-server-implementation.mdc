@@ -3,65 +3,122 @@ description:
 globs: **/api/mcp/**/*.ts, **/lib/mcp/**/*.ts, **/server/mcp/**/*.ts
 alwaysApply: false
 ---
+---
+description: Model Context Protocol Implementation Guidelines
+globs: **/api/mcp/**/*.ts, **/lib/mcp/**/*.ts, **/server/mcp/**/*.ts, **/api/context/**/*.ts
+alwaysApply: false
+---
 You are implementing a Model Context Protocol (MCP) server for AI agent knowledge persistence.
 
 API Structure
-- Create RESTful endpoints following consistent URL patterns (/api/context, /api/entities, etc.)
-- Implement proper error handling with descriptive messages and appropriate status codes
+- Create RESTful endpoints with these exact URL patterns:
+  - GET /api/context/entity/[id] - Single entity retrieval with optional depth
+  - GET /api/context/related/[id] - Related entities with filtering
+  - POST /api/context/search - Semantic search with relevance scoring
+  - GET /api/context/file/[path] - File-based context retrieval
+  - POST /api/context/similarity - Entity similarity scoring
+- Implement status codes: 200 (success), 400 (validation error), 404 (not found), 500 (server error)
 - Use TypeScript interfaces for all request/response models
-- Structure API responses with consistent formats {status, data, error}
-- Include pagination, sorting, and filtering for list endpoints
-- Add appropriate validation for all input parameters
+- Structure responses as: { data, metadata: { count, filters }, error }
+- Include pagination (limit, offset) with total count for list endpoints
+- Validate all inputs with zod schemas
 
 Knowledge Graph Operations
-- Use the DuckDB storage layer for all graph operations
-- Implement efficient querying for context retrieval with parametrized queries
-- Create indexes for performance-critical queries (entity lookup, text search)
-- Support batch operations for entity and relationship creation/updates
-- Implement proper transactions for multi-entity operations
-- Separate database models from API response models
+- Use DuckDB with these specific connection patterns:
+```typescript
+import { Database } from 'duckdb-async';
+import path from 'path';
 
-Context Retrieval Optimization
-- Implement relevance scoring for context query results
-- Support multiple query parameters (file path, component name, feature, keywords)
-- Allow filtering by project, entity type, and confidence score
-- Include relationship depth parameters for graph traversal
-- Support cross-project queries with appropriate boundaries
-- Optimize for low-latency responses (<100ms) for context queries
+export async function getDb() {
+  const db = await Database.create(path.join(process.cwd(), 'data/knowledge.db'));
+  return db;
+}
+
+export async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
+  const db = await getDb();
+  try {
+    return await db.all(sql, params);
+  } finally {
+    await db.close();
+  }
+}
+```
+- Use parameterized queries with ? placeholders (not $1, $2)
+- Create indexes for entity_id, project_id, and entity_type columns
+- Implement transactions for multi-entity operations with proper error handling
+
+Context Retrieval Implementation
+- Use this exact relevance scoring formula:
+```sql
+CASE 
+  WHEN LOWER(e.name) = LOWER(?) THEN 3.0
+  WHEN LOWER(e.name) LIKE LOWER(?) THEN 2.0
+  WHEN e.entity_type = ? THEN 1.5
+  ELSE 1.0
+END + (e.confidence * 0.5) + (JULIANDAY(e.updated_at) - JULIANDAY('2020-01-01')) / 365.0 AS relevance
+```
+- Allow filtering with SQL conditions like:
+```sql
+WHERE
+  (? IS NULL OR e.project_id = ?) AND
+  (? IS NULL OR e.entity_type IN (${entityTypeParams})) AND
+  (? IS NULL OR e.confidence >= ?)
+```
+- Implement relationship traversal with recursive CTEs and explicit depth limits
 
 Entity Models
-- Create consistent entity models with required fields: id, name, type, project
-- Support metadata fields for additional entity properties
-- Include timestamps for creation and last update
-- Track source information (conversation ID, timestamp)
-- Implement versioning for entity changes
-- Support confidence scoring for entities (0.0-1.0)
+- Use these exact entity schema definitions:
+```sql
+CREATE TABLE IF NOT EXISTS entities (
+  id VARCHAR PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  entity_type VARCHAR NOT NULL,
+  project_id VARCHAR NOT NULL,
+  confidence REAL DEFAULT 1.0,
+  metadata JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (project_id) REFERENCES projects(id)
+);
+CREATE INDEX IF NOT EXISTS idx_entities_project ON entities(project_id);
+CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(entity_type);
+```
 
-Relationship Models
-- Define typed relationships with proper directionality (from, to, type)
-- Include strength indicators for relationships (0.0-1.0)
-- Support metadata for relationship context
-- Implement traversal optimization for frequently accessed paths
-- Allow cross-project relationships with appropriate constraints
+Relationship Implementation
+- Define relationships with these exact schema definitions:
+```sql
+CREATE TABLE IF NOT EXISTS relationships (
+  id VARCHAR PRIMARY KEY,
+  from_entity_id VARCHAR NOT NULL,
+  to_entity_id VARCHAR NOT NULL,
+  relation_type VARCHAR NOT NULL,
+  confidence REAL DEFAULT 1.0,
+  metadata JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (from_entity_id) REFERENCES entities(id),
+  FOREIGN KEY (to_entity_id) REFERENCES entities(id)
+);
+CREATE INDEX IF NOT EXISTS idx_rel_from ON relationships(from_entity_id);
+CREATE INDEX IF NOT EXISTS idx_rel_to ON relationships(to_entity_id);
+CREATE INDEX IF NOT EXISTS idx_rel_type ON relationships(relation_type);
+```
 
-Observation Handling
-- Store observations as text with entity associations
-- Support versioning for observations
-- Include creation and update timestamps
-- Track observation sources
-- Implement confidence scoring
-- Support invalidation without deletion for historical tracking
-
-Project Separation
-- Ensure strict project boundaries in default queries
-- Implement project-based access controls
-- Support cross-project relationship visibility when requested
-- Maintain project metadata (name, description, creation date)
-- Track project-level statistics (entity counts, relationship density)
-
-Integration with AI Agents
-- Create optimized batch update endpoints for agent-discovered knowledge
-- Implement confidence adjustment mechanisms
-- Support knowledge invalidation workflows
-- Provide efficient context retrieval for time-sensitive agent operations
-- Enable schema introspection for agent understanding
+Response Processing
+- Process query results with proper relationship nesting:
+```typescript
+function processEntity(entity: any): Entity {
+  return {
+    id: entity.id,
+    name: entity.name,
+    entity_type: entity.entity_type,
+    confidence: entity.confidence,
+    project_id: entity.project_id,
+    metadata: entity.metadata ? JSON.parse(entity.metadata) : {},
+    created_at: entity.created_at,
+    updated_at: entity.updated_at,
+    relationships: [], // Will be populated if relationships are included
+    observations: []   // Will be populated if observations are included
+  };
+}
+```

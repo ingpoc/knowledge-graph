@@ -3,12 +3,28 @@ description:
 globs: **/api/**/*.ts, **/app/api/**/*.ts
 alwaysApply: false
 ---
-API Development
-- Create RESTful API endpoints following HTTP standards.
-- Implement proper error handling and status codes.
-- Validate input data with strong typing.
-- Create middleware for common operations like authentication.
-- Document API endpoints with clear JSDoc comments.
-- Implement rate limiting and security best practices.
-- Use consistent response format across all endpoints.
-- Handle pagination for list endpoints.
+---
+description: Knowledge Graph API Rules
+globs: **/api/**/*.ts, **/app/api/**/*.ts
+alwaysApply: false
+---
+API Development for Knowledge Graph
+- Create RESTful API endpoints following consistent URL patterns:
+  - GET /api/context/entity/[id] - Single entity retrieval
+  - GET /api/context/related/[id] - Related entities retrieval
+  - POST /api/context/search - Advanced semantic search
+  - GET /api/context/file/[path] - File-based context retrieval
+  - POST /api/context/similarity - Entity similarity scoring
+- Implement detailed error handling with appropriate status codes and error messages.
+- Use zod for input validation with specific error mappings.
+- Include comprehensive pagination (limit, offset) with total count in responses.
+- Implement relevance scoring for search results with multi-factor weights:
+  - Exact match: 3.0
+  - Name similarity: 2.0
+  - Type match: 1.5
+  - Recency: 1.0
+- Support relationship traversal depth parameters (default: 1, max: 3).
+- Enable filtering by multiple entity types, confidence thresholds (0.0-1.0).
+- Provide sort options (relevance, name, updated_at) with direction (asc/desc).
+- Use consistent response format: { data, metadata: { count, filters }, error }.
+- Include performance metrics in response metadata (query_time_ms).

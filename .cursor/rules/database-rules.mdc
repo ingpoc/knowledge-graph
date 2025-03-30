@@ -3,14 +3,23 @@ description:
 globs: **/db/**/*.ts, **/lib/db/**/*.ts
 alwaysApply: false
 ---
+---
+description: DuckDB Database Rules
+globs: **/db/**/*.ts, **/lib/db/**/*.ts
+alwaysApply: false
+---
 DuckDB and Data Handling
-- Create a database service layer under /lib/db.
-- Use parameterized queries to prevent injection.
-- Implement connection pooling for efficient database usage.
-- Create type-safe query builders for database operations.
-- Handle errors gracefully with appropriate logging.
-- Implement proper transactions for multi-record operations.
-- Use optimistic updates for improved UX.
-- Create clear separation between database and UI models.
-- Implement proper data validation before storage.
-- Cache frequent queries for better performance.
+- Use DuckDB exclusively for all database operations - no SQLite patterns.
+- Create a database service layer under /lib/db with connection pooling.
+- Use DuckDB-specific parameterized queries with ? placeholders (not $1, $2).
+- Implement proper transaction management using DuckDB's transaction API.
+- Use explicit SQL type declarations for column definitions (VARCHAR, INTEGER, etc).
+- Implement recursive queries for relationship traversal with proper CTEs.
+- Handle nested JSON operations with DuckDB's JSON operators (->> for extraction).
+- Create proper indexes on frequently queried columns (entity_id, file_path).
+- Implement batch operations for multi-record inserts and updates.
+- Use CASE expressions for complex conditional logic in queries.
+- Cache frequent queries with appropriate invalidation strategy.
+- Close connections properly to prevent resource leaks.
+- Include specific error handling for DuckDB error codes.
+- Use full text search capabilities for text-based queries.

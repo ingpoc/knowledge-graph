@@ -3,14 +3,47 @@ description:
 globs: 
 alwaysApply: false
 ---
+---
+description: Performance Optimization Rules
+globs: **/*.ts, **/*.tsx
+alwaysApply: false
+---
 Performance Optimization
+
+React & Next.js Optimization:
 - Minimize 'use client', 'useEffect', and 'useState'; favor React Server Components (RSC).
 - Wrap client components in Suspense with fallback.
 - Use dynamic loading for non-critical components.
-- Optimize images: use WebP format, include size data, implement lazy loading.
+- Optimize images with Next.js Image component (WebP format, proper sizing).
 - Use React.memo for expensive render components.
-- Implement virtualization for large lists and tables.
-- Cache expensive calculations with useMemo.
-- Use incremental static regeneration for semi-static pages.
-- Optimize bundle size with proper code splitting.
-- Minimize client-side JavaScript when possible.
+- Implement virtualization for large lists/tables with react-virtualized/react-window.
+
+Knowledge Graph Query Optimization:
+- Use indexed fields in WHERE clauses (entity_id, project_id, entity_type).
+- Limit relationship traversal depth with explicit depth parameters (max: 3).
+- Implement query result caching for frequently accessed entities.
+- Use Common Table Expressions (CTEs) for recursive relationship queries:
+```sql
+WITH RECURSIVE related_entities AS (
+  -- Base case: directly connected entities
+  SELECT id, name, entity_type, 1 as depth 
+  FROM entities 
+  WHERE id IN (SELECT to_entity_id FROM relationships WHERE from_entity_id = ?)
+  
+  UNION ALL
+  
+  -- Recursive case: next level of connections
+  SELECT e.id, e.name, e.entity_type, re.depth + 1
+  FROM entities e
+  JOIN relationships r ON e.id = r.to_entity_id
+  JOIN related_entities re ON r.from_entity_id = re.id
+  WHERE re.depth < ?
+)
+SELECT * FROM related_entities ORDER BY depth
+```
+- Use proper JOIN types (INNER, LEFT) based on data requirements.
+- Implement batched updates for multiple entity operations.
+- Apply pagination for all list queries (limit/offset).
+- Create composite indexes for frequently combined filters.
+- Use subqueries sparingly; prefer JOINs for better performance.
+- Implement query timeouts for complex graph traversals (3000ms max).

@@ -3,14 +3,63 @@ description: Knowledge Graph Rules
 globs: 
 alwaysApply: false
 ---
+---
+description: Knowledge Graph Rules
+globs: **/graph/**/*.ts, **/components/graph/**/*.tsx
+alwaysApply: false
+---
 Knowledge Graph Implementation
-- Use D3.js for relationship visualization, wrapped in React components.
-- Implement proper graph navigation tools (zoom, pan, filter).
-- Show relationship strength with line thickness proportional to strength.
-- Use dashed green lines for distinct relationships.
-- Implement parent-child relationship detection based on naming conventions.
-- Add directional arrows to show relationship direction.
-- Create explicit visual representation with special hierarchy links.
-- Provide visual context for relationships with tooltips and highlights.
-- Ensure relationship visualization is interactive and informative.
-- Implement proper performance optimizations for large graphs.
+
+Entity-Relationship Model:
+- Define complete TypeScript interfaces for core data structures:
+```typescript
+interface Entity {
+  id: string;
+  name: string;
+  entity_type: string;
+  project_id: string;
+  confidence: number;
+  metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  relationships?: Relationship[];
+  observations?: Observation[];
+}
+
+interface Relationship {
+  id: string;
+  from_entity_id: string;
+  to_entity_id: string;
+  relation_type: string;
+  confidence: number;
+  metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  from_entity?: Entity;
+  to_entity?: Entity;
+}
+
+interface Observation {
+  id: string;
+  entity_id: string;
+  content: string;
+  confidence: number;
+  metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  entity?: Entity;
+}
+```
+
+Visualization:
+- Use D3.js for relationship visualization with appropriate force-directed layout.
+- Represent entities as nodes with type-specific colors and icons.
+- Visualize relationship strength with line thickness (1-5px).
+- Use directional arrows to show relationship flow.
+- Implement zoom/pan controls with minimum/maximum zoom limits.
+- Show relationship types with different line styles (solid, dashed, dotted).
+- Add interactive tooltips showing full entity/relationship details.
+- Implement filtering controls for entity types and relationship types.
+- Support highlighting of connected entities on hover/selection.
+- Optimize rendering for large graphs (>100 nodes) with WebGL.
+- Implement proper node collision detection and overlap prevention.
