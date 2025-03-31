@@ -20,13 +20,13 @@ export async function GET(req: NextRequest) {
     
     // Add projectId filter if specified
     if (projectId && projectId !== "all") {
-      conditions.push("e.project_id = ?");
+      conditions.push("project_id = ?");
       params.push(projectId);
     }
     
     // Add entityType filter if specified
     if (entityTypes.length > 0) {
-      conditions.push(`e.entity_type IN (${entityTypes.map(() => '?').join(', ')})`);
+      conditions.push(`entity_type IN (${entityTypes.map(() => '?').join(', ')})`);
       params.push(...entityTypes);
     }
     
